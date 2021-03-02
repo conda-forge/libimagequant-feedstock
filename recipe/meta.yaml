@@ -1,5 +1,5 @@
 {% set name = "libimagequant" %}
-{% set version = "2.13.1" %}
+{% set version = "2.14.1" %}
 
 package:
   name: {{ name }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ImageOptim/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: 1f46deec3fa280335cf7f0be3ede6006bb420ba8159a03d1f6938e8d283d03ae
+  sha256: b5fa27da1f3cf3e8255dd02778bb6a51dc71ce9f99a4fc930ea69b83200a7c74
 
 build:
   skip: true  # [win]
@@ -32,7 +32,7 @@ about:
   home: https://pngquant.org/
   license: GPL-3.0-or-later
   license_file: COPYRIGHT
-  summary: 'Palette quantization library that powers pngquant and other PNG optimizers'
+  summary: Palette quantization library that powers pngquant and other PNG optimizers
 
 extra:
   recipe-maintainers:
