@@ -1,5 +1,5 @@
 {% set name = "libimagequant" %}
-{% set version = "2.14.1" %}
+{% set version = "2.15.0" %}
 
 package:
   name: {{ name }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ImageOptim/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: b5fa27da1f3cf3e8255dd02778bb6a51dc71ce9f99a4fc930ea69b83200a7c74
+  sha256: 11b15f4057feb9de724415f71a8e369942218e1691bb75838167bc986591fc36
 
 build:
   skip: true  # [win]
