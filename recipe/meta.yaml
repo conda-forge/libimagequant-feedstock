@@ -18,13 +18,15 @@ requirements:
     - {{ compiler('c') }}
     - pkg-config
     - make
-    - llvm-openmp  # [osx]
+    - cmake        # [win]
+    - llvm-openmp  # [not linux]
     - libgomp      # [linux]
 
 test:
   commands:
-    - test -f $PREFIX/lib/libimagequant.so  # [linux]
-    - test -f $PREFIX/lib/libimagequant.0.dylib  # [osx]
+    - test -f $PREFIX/lib/libimagequant.so                 # [linux]
+    - test -f $PREFIX/lib/libimagequant.0.dylib            # [osx]
+    - if not exist %LIBRARY_BIN%\libimagequant.dll exit 1  # [win]
 
 about:
   home: https://pngquant.org/lib/
