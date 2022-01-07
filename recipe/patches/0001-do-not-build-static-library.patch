@@ -1,0 +1,38 @@
+From 92c524e0fae56955cdde9d4f207c8634b1e05993 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Fri, 7 Jan 2022 18:32:20 +1100
+Subject: [PATCH] do not build static library
+
+---
+ CMakeLists.txt | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d14f058..82bac6b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -35,15 +35,6 @@ add_library(imagequant SHARED
+   kmeans.c
+ )
+ 
+-add_library(imagequant_a STATIC
+-  libimagequant.c
+-  blur.c
+-  mediancut.c
+-  mempool.c
+-  nearest.c
+-  pam.c
+-  kmeans.c
+-)
+ set_target_properties(imagequant PROPERTIES SOVERSION 0
+   VERSION 0.0)
+ 
+@@ -52,5 +43,4 @@ configure_file(imagequant.pc.in imagequant.pc @ONLY)
+ 
+ install(TARGETS imagequant        LIBRARY           DESTINATION ${LIB_INSTALL_DIR})
+ install(FILES                     libimagequant.h   DESTINATION include)
+-install(FILES ${CMAKE_BINARY_DIR}/libimagequant_a.a DESTINATION ${LIB_INSTALL_DIR} RENAME libimagequant.a)
+ install(FILES ${CMAKE_BINARY_DIR}/imagequant.pc     DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+-- 
+2.32.0.windows.2
+
