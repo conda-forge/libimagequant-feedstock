@@ -1,0 +1,103 @@
+From 5d05609bba44d4d1d757c238df72aefcaf0b5584 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Fri, 7 Jan 2022 14:57:26 +1100
+Subject: [PATCH 2/2] fix some OpenMP for-loop statements for windows
+
+Inspired by:
+https://github.com/ImageOptim/libimagequant/compare/2.x...msvc
+---
+ kmeans.c        |  3 ++-
+ libimagequant.c |  3 ++-
+ mediancut.c     | 12 ++++++++----
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/kmeans.c b/kmeans.c
+index 3373f90..aa33d7c 100644
+--- a/kmeans.c
++++ b/kmeans.c
+@@ -82,6 +82,7 @@ LIQ_PRIVATE double kmeans_do_iteration(histogram *hist, colormap *const map, kme
+     const int hist_size = hist->size;
+ 
+     double total_diff=0;
++    int j;
+ #if __GNUC__ >= 9 || __clang__
+     #pragma omp parallel for if (hist_size > 2000) \
+         schedule(static) default(none) shared(achv,average_color,callback,hist_size,map,n) reduction(+:total_diff)
+@@ -89,7 +90,7 @@ LIQ_PRIVATE double kmeans_do_iteration(histogram *hist, colormap *const map, kme
+     #pragma omp parallel for if (hist_size > 2000) \
+         schedule(static) default(none) shared(average_color,callback) reduction(+:total_diff)
+ #endif
+-    for(int j=0; j < hist_size; j++) {
++    for(j=0; j < hist_size; j++) {
+         float diff;
+         const f_pixel px = achv[j].acolor;
+         const unsigned int match = nearest_search(n, &px, achv[j].tmp.likely_colormap_index, &diff);
+diff --git a/libimagequant.c b/libimagequant.c
+index a9b3730..03792ea 100644
+--- a/libimagequant.c
++++ b/libimagequant.c
+@@ -1277,11 +1277,12 @@ LIQ_NONNULL static float remap_to_palette(liq_image *const input_image, unsigned
+     LIQ_ARRAY(kmeans_state, average_color, (KMEANS_CACHE_LINE_GAP+map->colors) * max_threads);
+     kmeans_init(map, max_threads, average_color);
+ 
++    int row;
+ #if __GNUC__ >= 9 || __clang__
+     #pragma omp parallel for if (rows*cols > 3000) \
+         schedule(static) default(none) shared(background,acolormap,average_color,cols,input_image,map,n,output_pixels,rows,transparent_index) reduction(+:remapping_error)
+ #endif
+-    for(int row = 0; row < rows; ++row) {
++    for(row = 0; row < rows; ++row) {
+         const f_pixel *const row_pixels = liq_image_get_row_f(input_image, row);
+         const f_pixel *const bg_pixels = background && acolormap[transparent_index].acolor.a < 1.f/256.f ? liq_image_get_row_f(background, row) : NULL;
+ 
+diff --git a/mediancut.c b/mediancut.c
+index 2df7941..1aebfc6 100644
+--- a/mediancut.c
++++ b/mediancut.c
+@@ -197,6 +197,7 @@ static double prepare_sort(struct box *b, hist_item achv[])
+ 
+     const unsigned int ind1 = b->ind;
+     const unsigned int colors = b->colors;
++    int i;
+ #if __GNUC__ >= 9 || __clang__
+     #pragma omp parallel for if (colors > 25000) \
+         schedule(static) default(none) shared(achv, channels, colors, ind1)
+@@ -204,7 +205,7 @@ static double prepare_sort(struct box *b, hist_item achv[])
+     #pragma omp parallel for if (colors > 25000) \
+         schedule(static) default(none) shared(achv, channels)
+ #endif
+-    for(unsigned int i=0; i < colors; i++) {
++    for(i=0; i < colors; i++) {
+         const float *chans = (const float *)&achv[ind1 + i].acolor;
+         // Only the first channel really matters. When trying median cut many times
+         // with different histogram weights, I don't want sort randomness to influence outcome.
+@@ -217,9 +218,12 @@ static double prepare_sort(struct box *b, hist_item achv[])
+     // box will be split to make color_weight of each side even
+     const unsigned int ind = b->ind, end = ind+b->colors;
+     double totalvar = 0;
++    int j;
+     #pragma omp parallel for if (end - ind > 15000) \
+         schedule(static) default(shared) reduction(+:totalvar)
+-    for(unsigned int j=ind; j < end; j++) totalvar += (achv[j].color_weight = color_weight(median, achv[j]));
++    for(j=ind; j < end; j++) {
++        totalvar += (achv[j].color_weight = color_weight(median, achv[j]));
++    }
+     return totalvar / 2.0;
+ }
+ 
+@@ -438,10 +442,10 @@ static void adjust_histogram(hist_item *achv, const struct box* bv, unsigned int
+ static f_pixel averagepixels(unsigned int clrs, const hist_item achv[])
+ {
+     double r = 0, g = 0, b = 0, a = 0, sum = 0;
+-
++    int i;
+     #pragma omp parallel for if (clrs > 25000) \
+         schedule(static) default(shared) reduction(+:a) reduction(+:r) reduction(+:g) reduction(+:b) reduction(+:sum)
+-    for(unsigned int i = 0; i < clrs; i++) {
++    for(i = 0; i < clrs; i++) {
+         const f_pixel px = achv[i].acolor;
+         const double weight = achv[i].adjusted_weight;
+ 
+-- 
+2.32.0.windows.2
+
