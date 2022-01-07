@@ -24,9 +24,17 @@ requirements:
 
 test:
   commands:
-    - test -f $PREFIX/lib/libimagequant.so                 # [linux]
-    - test -f $PREFIX/lib/libimagequant.0.dylib            # [osx]
-    - if not exist %LIBRARY_BIN%\libimagequant.dll exit 1  # [win]
+    # shared
+    - test -f $PREFIX/lib/libimagequant.so              # [linux]
+    - test -f $PREFIX/lib/libimagequant.dylib           # [osx]
+    - if not exist %LIBRARY_BIN%\imagequant.dll exit 1  # [win]
+
+    # absence of static libraries
+    - test ! -f $PREFIX/lib/libimagequant.a             # [not win]
+
+    # header
+    - test -f $PREFIX/include/libimagequant.h || (echo "libimagequant.h not found" && exit 1)  # [unix]
+    - if not exist %LIBRARY_INC%\libimagequant.h exit 1                                        # [win]
 
 about:
   home: https://pngquant.org/lib/
