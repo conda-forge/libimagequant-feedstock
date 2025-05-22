@@ -33,12 +33,14 @@ requirements:
 tests:
   - package_contents:
       lib:
-        - libimagequant
+        - if: not win
+          then:
+            - imagequant
       include:
         - libimagequant.h
       files:
         exists:
-          - lib/pkgconfig/imagequant.pc
+          - "**/lib/pkgconfig/imagequant.pc"
         not_exists:
           # absence of static libraries
           - lib/libimagequant.a
