@@ -17,7 +17,7 @@ build:
       then:
         - cargo cinstall --prefix="%LIBRARY_PREFIX%" --library-type=cdylib --release
       else:
-        - cargo cinstall --prefix="$PREFIX" --library-type=cdylib --release
+        - cargo cinstall --prefix="$PREFIX" --libdir="$PREFIX/lib" --library-type=cdylib --release
     - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
 
 requirements:
