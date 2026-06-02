@@ -1,0 +1,61 @@
+context:
+  version: 4.3.4
+
+package:
+  name: libimagequant
+  version: ${{ version }}
+
+source:
+  - url: https://github.com/ImageOptim/libimagequant/archive/refs/tags/${{ version }}.tar.gz
+    sha256: b86f4ac0eb707af88b0a000e2e2409e399c6969c9d0d988efafaff138cebaf96
+
+build:
+  number: 0
+  script:
+    - cd imagequant-sys
+    - if: win
+      then:
+        - cargo cinstall --prefix="%LIBRARY_PREFIX%" --library-type=cdylib --release
+      else:
+        - cargo cinstall --prefix="$PREFIX" --libdir="$PREFIX/lib" --library-type=cdylib --release --target=$CARGO_BUILD_TARGET
+    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
+
+requirements:
+  run_exports:
+    - ${{ pin_subpackage('libimagequant', exact=True) }}
+  build:
+    - ${{ stdlib('c') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('rust') }}
+    - cargo-bundle-licenses
+    - cargo-c
+
+tests:
+  - package_contents:
+      lib:
+        - if: not win
+          then:
+            - imagequant
+      include:
+        - libimagequant.h
+      files:
+        exists:
+          - "**/lib/pkgconfig/imagequant.pc"
+        not_exists:
+          # absence of static libraries
+          - lib/libimagequant.a
+
+about:
+  summary: Palette quantization library that powers pngquant and other PNG optimizers
+  license: GPL-3.0-or-later
+  license_file:
+    - COPYRIGHT
+    - imagequant-sys/THIRDPARTY.yml
+  homepage: https://pngquant.org/lib/
+  repository: https://github.com/ImageOptim/libimagequant
+
+extra:
+  recipe-maintainers:
+    - "0xbe7a"
+    - izahn
+    - h-vetinari
