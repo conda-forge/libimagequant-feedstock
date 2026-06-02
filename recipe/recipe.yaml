@@ -49,7 +49,7 @@ about:
   summary: Palette quantization library that powers pngquant and other PNG optimizers
   license: GPL-3.0-or-later
   license_file:
-    - imagequant-sys/LICENSE
+    - COPYRIGHT
     - imagequant-sys/THIRDPARTY.yml
   homepage: https://pngquant.org/lib/
   repository: https://github.com/ImageOptim/libimagequant
