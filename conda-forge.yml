@@ -4,6 +4,8 @@ github:
   tooling_branch_name: main
 conda_build:
   pkg_format: "2"
+build_platform:
+  linux_ppc64le: linux_64
 provider:
   linux_aarch64: default
   osx_arm64: default
