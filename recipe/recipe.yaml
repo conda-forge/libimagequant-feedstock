@@ -10,12 +10,12 @@ source:
     sha256: 2464a3e922b5a220b633d674062b82f0670114f8f3dd30d1935a621c95965f1b
 
 build:
-  number: 0
+  number: 1
   script:
     - cd imagequant-sys
     - if: win
       then:
-        - cargo cinstall --prefix="%LIBRARY_PREFIX%" --library-type=cdylib --release
+        - cargo cinstall --prefix="%LIBRARY_PREFIX%" --library-type=cdylib --release --meson-paths
       else:
         - cargo cinstall --prefix="$PREFIX" --libdir="$PREFIX/lib" --library-type=cdylib --release --target=$CARGO_BUILD_TARGET
     - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
@@ -33,9 +33,7 @@ requirements:
 tests:
   - package_contents:
       lib:
-        - if: not win
-          then:
-            - imagequant
+        - imagequant
       include:
         - libimagequant.h
       files:
